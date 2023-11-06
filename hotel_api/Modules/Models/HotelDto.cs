@@ -1,13 +1,9 @@
 
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 
-namespace Hotels.Model
+namespace Hotels.Modules.Model
 {
-    public class Hotel
+    public class HotelDto
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
