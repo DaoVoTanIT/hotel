@@ -6,30 +6,27 @@ using Hotels.Modules.Model;
 using Microsoft.AspNetCore.Mvc;
 namespace Hotels.Modules.Controller
 {
-
-    [Route("Api/Hotel")]
+    [Route("Api/Payment")]
     [ApiController]
-    public class HotelController : ControllerBase
+    public class PaymentController : ControllerBase
     {
         protected APIResponse _response;
         private readonly IMapper _mapper;
-        private readonly IHotelRepository _hotelRepository;
+        private readonly IPaymentRepository _PaymentRepository;
 
-        public HotelController(IHotelRepository hotelRepository, IMapper mapper)
+        public PaymentController(IPaymentRepository PaymentRepository, IMapper mapper)
         {
-            this._hotelRepository = hotelRepository;
+            this._PaymentRepository = PaymentRepository;
             this._mapper = mapper;
             this._response = new();
         }
-
-        [HttpGet("GetAllHotel")]
-        [ProducesResponseType(typeof(List<HotelDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllHotel()
+        [HttpGet("GetAllPayment")]
+        public async Task<ActionResult<APIResponse>> GetAllPayment()
         {
             try
             {
-                IEnumerable<Hotel> listHotel = await _hotelRepository.GetAllAsync();
-                _response.Result = _mapper.Map<List<HotelDto>>(listHotel);
+                IEnumerable<Payment> listPayment = await _PaymentRepository.GetAllAsync();
+                _response.Result = _mapper.Map<List<PaymentDto>>(listPayment);
                 return Ok(_response);
             }
             catch (Exception ex)
@@ -41,18 +38,16 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpGet("GetHotelById/{id}")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetHotelById(string id)
+        [HttpGet("GetAllPayment/{id}")]
+        public async Task<ActionResult<APIResponse>> GetPaymentById(string id)
         {
             try
             {
-                var hotel = await _hotelRepository.GetAsync(u => u.Id == id);
-                if (hotel == null)
-                {
+                var model = await _PaymentRepository.GetAsync(u=> u.Id == id);
+                if(model ==null){
                     return BadRequest();
                 }
-                _response.Result = _mapper.Map<HotelDto>(hotel);
+                _response.Result = _mapper.Map<PaymentDto>(model);
                 return Ok(_response);
             }
             catch (Exception ex)
@@ -64,22 +59,20 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpPost("CreateHotel")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> AddHotel([FromBody] HotelDto hotelDto)
+        [HttpPost("CreatePayment")]
+        public async Task<ActionResult<APIResponse>> CreatePayment(PaymentDto PaymentDto)
         {
-
             try
             {
-                if (await _hotelRepository.GetAsync(u => u.Id == hotelDto.Id) != null || hotelDto == null)
+                if (await _PaymentRepository.GetAsync(u => u.Id == PaymentDto.Id) != null || PaymentDto == null)
                 {
                     ModelState.AddModelError("Custom model", "Hotel already exists");
                     return BadRequest(ModelState);
                 }
-                hotelDto.Id = Guid.NewGuid().ToString();
-                Hotel model = _mapper.Map<Hotel>(hotelDto);
-                await _hotelRepository.CreateAsync(model);
-                _response.Result = hotelDto;
+                PaymentDto.Id = Guid.NewGuid().ToString();
+                Payment model = _mapper.Map<Payment>(PaymentDto);
+                await _PaymentRepository.CreateAsync(model);
+                _response.Result = _mapper.Map<PaymentDto>(model);
                 return Ok(model);
             }
             catch (Exception ex)
@@ -91,19 +84,19 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpPut("UpdateHotel/{id}")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateHotel(string id, [FromBody] HotelDto hotelDto)
+        [HttpPut("UpdatePayment/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> UpdateHotel(string id, [FromBody] PaymentDto PaymentDto)
         {
             try
             {
-                if (hotelDto == null || id != hotelDto.Id)
+                if (PaymentDto == null || id != PaymentDto.Id)
                 {
                     return BadRequest();
                 }
-                Hotel model = _mapper.Map<Hotel>(hotelDto);
-                await _hotelRepository.UpdateAsync(model);
-                _response.Result = _mapper.Map<HotelDto>(model);
+                Payment model = _mapper.Map<Payment>(PaymentDto);
+                await _PaymentRepository.UpdateAsync(model);
+                _response.Result = _mapper.Map<PaymentDto>(model);
                 _response.IsSuccess = true;
                 return Ok(_response);
             }
@@ -116,19 +109,18 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpDelete("DeleteHotel/{id}")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
+        [HttpDelete("DeletePayment/{id}")]
         public async Task<ActionResult<APIResponse>> DeleteHotel(string id)
         {
             try
             {
-                var model = await _hotelRepository.GetAsync(u => u.Id == id);
+                var model = await _PaymentRepository.GetAsync(u => u.Id == id);
                 if (model == null)
                 {
                     return NotFound();
                 }
-                await _hotelRepository.RemoveAsync(model);
-                _response.Result = _mapper.Map<HotelDto>(model);
+                await _PaymentRepository.RemoveAsync(model);
+                _response.Result = _mapper.Map<PaymentDto>(model);
                 _response.IsSuccess = true;
                 return Ok(_response);
             }

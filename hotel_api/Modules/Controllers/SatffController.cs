@@ -6,15 +6,15 @@ using Hotels.Modules.Model;
 using Microsoft.AspNetCore.Mvc;
 namespace Hotels.Modules.Controller
 {
-    [Route("api/Staff")]
+    [Route("Api/Staff")]
     [ApiController]
-    public class StaffAPIController : ControllerBase
+    public class StaffController : ControllerBase
     {
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly IStaffRepository _staffRepository;
 
-        public StaffAPIController(IStaffRepository staffRepository, IMapper mapper)
+        public StaffController(IStaffRepository staffRepository, IMapper mapper)
         {
             this._staffRepository = staffRepository;
             this._mapper = mapper;
@@ -26,7 +26,7 @@ namespace Hotels.Modules.Controller
             try
             {
                 IEnumerable<Staff> listStaff = await _staffRepository.GetAllAsync();
-                _response.Result = _mapper.Map<List<Staff>>(listStaff);
+                _response.Result = _mapper.Map<List<StaffDto>>(listStaff);
                 return Ok(_response);
             }
             catch (Exception ex)
@@ -47,7 +47,7 @@ namespace Hotels.Modules.Controller
                 if(model ==null){
                     return BadRequest();
                 }
-                _response.Result = _mapper.Map<List<StaffDto>>(model);
+                _response.Result = _mapper.Map<StaffDto>(model);
                 return Ok(_response);
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@ namespace Hotels.Modules.Controller
                 staffDto.Id = Guid.NewGuid().ToString();
                 Staff model = _mapper.Map<Staff>(staffDto);
                 await _staffRepository.CreateAsync(model);
-                _response.Result = staffDto;
+                _response.Result = _mapper.Map<StaffDto>(model);
                 return Ok(model);
             }
             catch (Exception ex)

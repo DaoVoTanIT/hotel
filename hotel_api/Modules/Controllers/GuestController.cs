@@ -2,34 +2,31 @@ using AutoMapper;
 using Hotels.Infrastructure.Models;
 using Hotels.Model;
 using Hotels.Modules.Interface;
-using Hotels.Modules.Model;
+using Hotels.Modules.Models;
 using Microsoft.AspNetCore.Mvc;
 namespace Hotels.Modules.Controller
 {
-
-    [Route("Api/Hotel")]
+    [Route("Api/Guest")]
     [ApiController]
-    public class HotelController : ControllerBase
+    public class GuestController : ControllerBase
     {
         protected APIResponse _response;
         private readonly IMapper _mapper;
-        private readonly IHotelRepository _hotelRepository;
+        private readonly IGuestRepository _GuestRepository;
 
-        public HotelController(IHotelRepository hotelRepository, IMapper mapper)
+        public GuestController(IGuestRepository GuestRepository, IMapper mapper)
         {
-            this._hotelRepository = hotelRepository;
+            this._GuestRepository = GuestRepository;
             this._mapper = mapper;
             this._response = new();
         }
-
-        [HttpGet("GetAllHotel")]
-        [ProducesResponseType(typeof(List<HotelDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllHotel()
+        [HttpGet("GetAllGuest")]
+        public async Task<ActionResult<APIResponse>> GetAllGuest()
         {
             try
             {
-                IEnumerable<Hotel> listHotel = await _hotelRepository.GetAllAsync();
-                _response.Result = _mapper.Map<List<HotelDto>>(listHotel);
+                IEnumerable<Guest> listGuest = await _GuestRepository.GetAllAsync();
+                _response.Result = _mapper.Map<List<GuestDto>>(listGuest);
                 return Ok(_response);
             }
             catch (Exception ex)
@@ -41,18 +38,16 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpGet("GetHotelById/{id}")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetHotelById(string id)
+        [HttpGet("GetAllGuest/{id}")]
+        public async Task<ActionResult<APIResponse>> GetGuestById(string id)
         {
             try
             {
-                var hotel = await _hotelRepository.GetAsync(u => u.Id == id);
-                if (hotel == null)
-                {
+                var model = await _GuestRepository.GetAsync(u=> u.Id == id);
+                if(model ==null){
                     return BadRequest();
                 }
-                _response.Result = _mapper.Map<HotelDto>(hotel);
+                _response.Result = _mapper.Map<GuestDto>(model);
                 return Ok(_response);
             }
             catch (Exception ex)
@@ -64,22 +59,20 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpPost("CreateHotel")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> AddHotel([FromBody] HotelDto hotelDto)
+        [HttpPost("CreateGuest")]
+        public async Task<ActionResult<APIResponse>> CreateGuest(GuestDto GuestDto)
         {
-
             try
             {
-                if (await _hotelRepository.GetAsync(u => u.Id == hotelDto.Id) != null || hotelDto == null)
+                if (await _GuestRepository.GetAsync(u => u.Id == GuestDto.Id) != null || GuestDto == null)
                 {
                     ModelState.AddModelError("Custom model", "Hotel already exists");
                     return BadRequest(ModelState);
                 }
-                hotelDto.Id = Guid.NewGuid().ToString();
-                Hotel model = _mapper.Map<Hotel>(hotelDto);
-                await _hotelRepository.CreateAsync(model);
-                _response.Result = hotelDto;
+                GuestDto.Id = Guid.NewGuid().ToString();
+                Guest model = _mapper.Map<Guest>(GuestDto);
+                await _GuestRepository.CreateAsync(model);
+                _response.Result = _mapper.Map<GuestDto>(model);
                 return Ok(model);
             }
             catch (Exception ex)
@@ -91,19 +84,19 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpPut("UpdateHotel/{id}")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateHotel(string id, [FromBody] HotelDto hotelDto)
+        [HttpPut("UpdateGuest/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> UpdateHotel(string id, [FromBody] GuestDto GuestDto)
         {
             try
             {
-                if (hotelDto == null || id != hotelDto.Id)
+                if (GuestDto == null || id != GuestDto.Id)
                 {
                     return BadRequest();
                 }
-                Hotel model = _mapper.Map<Hotel>(hotelDto);
-                await _hotelRepository.UpdateAsync(model);
-                _response.Result = _mapper.Map<HotelDto>(model);
+                Guest model = _mapper.Map<Guest>(GuestDto);
+                await _GuestRepository.UpdateAsync(model);
+                _response.Result = _mapper.Map<GuestDto>(model);
                 _response.IsSuccess = true;
                 return Ok(_response);
             }
@@ -116,19 +109,18 @@ namespace Hotels.Modules.Controller
             }
             return _response;
         }
-        [HttpDelete("DeleteHotel/{id}")]
-        [ProducesResponseType(typeof(HotelDto), StatusCodes.Status200OK)]
+        [HttpDelete("DeleteGuest/{id}")]
         public async Task<ActionResult<APIResponse>> DeleteHotel(string id)
         {
             try
             {
-                var model = await _hotelRepository.GetAsync(u => u.Id == id);
+                var model = await _GuestRepository.GetAsync(u => u.Id == id);
                 if (model == null)
                 {
                     return NotFound();
                 }
-                await _hotelRepository.RemoveAsync(model);
-                _response.Result = _mapper.Map<HotelDto>(model);
+                await _GuestRepository.RemoveAsync(model);
+                _response.Result = _mapper.Map<GuestDto>(model);
                 _response.IsSuccess = true;
                 return Ok(_response);
             }

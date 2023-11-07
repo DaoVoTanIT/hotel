@@ -7,15 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hotels.Modules.Controller
 {
-    [Route("api/RoomType")]
+    [Route("Api/RoomType")]
     [ApiController]
-    public class RoomTypeAPIController : ControllerBase
+    public class RoomTypeController : ControllerBase
     {
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly IRoomTypeRepository _roomTypeRepository;
 
-        public RoomTypeAPIController(IRoomTypeRepository roomTypeRepository, IMapper mapper)
+        public RoomTypeController(IRoomTypeRepository roomTypeRepository, IMapper mapper)
         {
             this._roomTypeRepository = roomTypeRepository;
             this._mapper = mapper;
